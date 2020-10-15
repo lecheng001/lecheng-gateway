@@ -1,0 +1,92 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+    <style type="text/css">
+
+
+        .a2 a {
+            border: #12518F solid 1px;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-left: 20px;
+            color: white;
+            background-color: #3a8ee6;
+        }
+
+        .a3 {
+            padding-top: 90px;
+        }
+
+        .a3 a {
+            border: #FFFFFF solid 1px;
+            border-radius: 5px;
+            padding: 20px 40px;
+            font-size: 20px;
+            margin-left: 20px;
+            color: white;
+            background-color: gray;
+        }
+
+        .content h3 {
+            color: #bbbbbb;
+            padding: 20px 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            border: none;
+            width: 95%;
+        }
+
+        td {
+            border: solid #000 1px;
+            padding: 5px;
+        }
+
+        .tr2 {
+            background-color: #5C92C4;
+        }
+
+    </style>
+{[{end}]}
+
+{[{define  "script"}]}
+    <script type="text/javascript">
+        function login() {
+            post("login", {loginname: $("#loginname").val(), loginpwd: $("#loginpwd").val()});
+        }
+
+    </script>
+{[{end}]}
+
+{[{define "content"}]}
+    <div style="background-color: #FAFAFA;">
+        <div class="content pb50">
+            <p class=" tc pt150">
+            <h1 class="tc " style="font-size: 40px;">会员登录</h1>
+            </p>
+
+            <div class="pt50 lh50" id="form">
+                <p class="tc">
+                    用户名：<input id="loginname" class="pl5" style="border: #8E8E8E solid 1px;border-radius: 5px;width: 200px;line-height: 30px;"/>
+                </p>
+                <p class="tc">
+                    密　码：<input id="loginpwd" class="pl5" type="password" style="border: #8E8E8E solid 1px;border-radius: 5px;width: 200px;line-height: 30px;"/>
+                </p>
+                <p class="tc">
+                    <input type="button" onclick="login()" value="登录" class="colFFF" style="border: #8E8E8E solid 1px; border-radius: 5px;width: 200px;line-height: 30px;background-color: #3a8ee6;"/>
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+{[{end}]}
+
+ 

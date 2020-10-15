@@ -1,0 +1,44 @@
+{
+  "requesttimeout": {
+    "content": "毫秒",
+    "title": "默认超时时间",
+    "type": "config",
+    "value": "12003",
+    "valuetype": "number"
+  },
+  "txt_errpostbody": {
+    "content": "json格式",
+    "title": "微服务接口配置业务参数，请求时未提供返回的提示信息",
+    "type": "json",
+    "value": "{\"content\":null,\"errcode\":-106,\"msg\":\"业务参数为必填，但没提供数据\"}",
+    "valuetype": "textarea"
+  },
+  "txt_nopostbody": {
+    "content": "json格式",
+    "title": "微服务接口请求post参数为空返回的提示信息",
+    "type": "json",
+    "value": "{\"content\":null,\"errcode\":-105,\"msg\":\"请求参数不允许为空\"}",
+    "valuetype": "textarea"
+  },
+  "txt_request404content": {
+    "content": "json格式",
+    "title": "请求404返回值",
+    "type": "json",
+    "value": "{\"content\":null,\"errcode\":-102,\"msg\":\"404 请求文件不存在\"}",
+    "valuetype": "textarea"
+  },
+  "txt_requesterrorcontent": {
+    "content": "json格式",
+    "title": "错误返回值",
+    "type": "json",
+    "value": "{\"content\":null,\"errcode\":-100,\"msg\":\"请求失败，请稍后重新操作\"}",
+    "valuetype": "textarea"
+  },
+  "txt_requesttimeoutcontent": {
+    "content": "json格式",
+    "title": "请求超时返回值",
+    "type": "json",
+    "value": "{\"content\":null,\"errcode\":-101,\"msg\":\"请求超时失败\"}",
+    "valuetype": "textarea"
+  }
+}

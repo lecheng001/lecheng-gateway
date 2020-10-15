@@ -1,0 +1,13 @@
+{
+  "log": {
+    "logtype": "console",
+    "level": "error"
+  },
+  "setting": {
+    "enable_lecheng_host_": "测试环境是否启用lecheng_host配置",
+    "enable_lecheng_host": true
+  }
+}
+
+
+

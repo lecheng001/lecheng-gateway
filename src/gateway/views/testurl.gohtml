@@ -1,0 +1,307 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+
+{[{end}]}
+
+{[{define  "script"}]}
+<link rel="stylesheet" href="/html/res/jsplus/jsonview/jquery.jsonview.css" />
+<script type="text/javascript" src="/html/res/jsplus/jsonview/jquery.jsonview.js"></script>
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+      data() {
+        return {
+          loglist: [],
+          testinfo: {pkid: 0, cmethod: 'post'},
+          runtime: 0,
+          status: "",
+          request_method:REQUEST_METHOD
+        }
+      },
+      mounted() {
+        this.$nextTick(function () {
+          $('#collapse-btn').on('click', function () {
+            $('#json').JSONView('collapse');
+          });
+
+          $('#expand-btn').on('click', function () {
+            $('#json').JSONView('expand');
+          });
+
+          $('#toggle-btn').on('click', function () {
+            $('#json').JSONView('toggle');
+          });
+
+          $('#toggle-level1-btn').on('click', function () {
+            $('#json').JSONView('toggle', 1);
+          });
+
+          $('#toggle-level2-btn').on('click', function () {
+            $('#json').JSONView('toggle', 2);
+          });
+          $('#toggle-level3-btn').on('click', function () {
+            $('#json').JSONView('toggle', 3);
+          });
+
+          this.initData()
+
+          window.setTimeout(() => {
+            this.cleartest()
+          }, 200)
+
+        })
+      },
+      methods: {
+        initData() {
+          this.loglist = {[{.loglist}]}
+        },
+        initData2(){
+          let vue=this
+          get( "testurl/list", null, function (data) {
+            vue.loglist=data.loglist
+          })
+        },
+        setTestInfo(index) {
+          this.testinfo = this.loglist[index]
+          $("#json").html(this.testinfo.cresponse)
+          if(this.testinfo.cresponse!=""){
+            // $("#json").JSONView(this.testinfo.cresponse);
+          }
+        },
+        getURLContent() {
+          let vue=this
+          // $("#cresponse").val(`数据请求中`+$("#cresponse").val())
+          $("#json").JSONView({"msg": "数据请求中。。。。。。。。。。。。。。。。。。。。。。。。"});
+          this.runtime = "请求中。。。。。。"
+          this.status = "0"
+          this.testinfo.cresponse = "数据请求中"
+          let tmpValue= formsubmit(this, 'choice_form_doctest', "/testurl/geturlcontent",  function (data) {
+            vue.testinfo.cresponse = data.responsecontent;
+            vue.runtime = data.runtime
+            vue.status = data.status
+
+            $("#json").html(data.responsecontent)
+            $("#json").JSONView(data.responsecontent);
+          })
+          if (tmpValue==-1){
+            this.runtime = ""
+            this.status = "0"
+            this.testinfo.cresponse = ""
+          }
+        },
+        saveRequestLog(isupdate) {
+          if (isupdate == 0) {
+            $("input[name=pkid]").val("0")
+          }
+          let vue=this
+          formsubmit(this, 'choice_form_doctest', "testurl/postdata", null, function (data) {
+            vue.initData2()
+          })
+        },
+        deldoc(id) {
+          let vue=this
+          if (confirm("确认删除吗？")) {
+            post( "testurl/delete", {pkid: id}, function (data) {
+              vue.initData2()
+            })
+          }
+        },
+        cleartest() {
+          let para = {"content":{"aa":"aa","bb":"bb"}}
+
+          this.testinfo = {
+            pkid: 0,
+            ctitle: "测试",
+            cquery: JSON.stringify(para),
+            cquery2:"",
+            cqueryrsa:"请生产AES密文",
+            cmethod: 'post',
+            curl:"",
+            chead:`{"lecheng-client":"","lecheng-version":0}`
+          }
+          $("#json").html("")
+
+        },
+        redirect(routename, query) {
+          this.util.Redirect(this, routename, query)
+        },
+        signencode(){
+            let vue=this
+            post( "/testurl/getsign", {query: this.testinfo.cquery,head:this.testinfo.chead,mehtod:this.testinfo.cmethod}, function (res) {
+              // console.log(res)
+              if(res.errcode<0){
+                alert(res.msg)
+                return
+              }
+              vue.testinfo.cquery2 = res.value
+            })
+        },
+        base64encode(){
+          this.testinfo.cqueryrsa =btoa($("textarea[name=cquery2]").val())
+        },
+        base64decode(){
+          // console.log(atob("eyJjb250ZW50Ijp7ImRldmljZWlkIjoiY2RldmljZWlkIiwidHlwZSI6ImFwcGxhdW5jaCIsInVzZXJpZCI6MTAwMDB9LCJsY3NpZ24iOiJjNmZmOTM3MTdhOTY3MTAyY2JhMGU1Yzg0ZjYxODAxNSJ9"))
+          this.testinfo.cquery2 =atob($("textarea[name=cqueryrsa]").val())
+        },
+        refreshurl(){
+          this.testinfo.curl=this.gatewayhost + this.openapiinfo.curl
+        }
+      },
+
+      filters: {
+        application(value1, value2) {
+          for (let i = 0; i < value2.length; i++) {
+            if (value1 == value2[i].cpath) {
+              return value2[i].ctitle
+            }
+          }
+          return value1
+        },
+        module(value1, value2) {
+          for (let i = 0; i < value2.length; i++) {
+            if (value1 == value2[i].curl) {
+              return value2[i].ctitle
+            }
+          }
+          return value1
+        },
+        datetime(timestamp){
+          let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+          let Y = date.getFullYear() + '-';
+          let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+          let D = date.getDate() + ' ';
+          let h = date.getHours() + ':';
+          let m = (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes()) + ':';
+          let s = date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
+          return Y + M + D + h + m + s;
+        }
+      }
+    })
+
+</script>
+
+{[{end}]}
+
+{[{define "content"}]}
+<div id="app" class=" dis_f " style="    flex-direction: row;
+    flex-wrap: wrap;">
+
+    <el-card class="box-card " style="width: 100%;overflow: auto;">
+
+    <div id="docdetest" style="display: flex; height: 100%;border: #B3C0D1 solid 1px;">
+      <div style="width: 210px; border-right: #B3C0D1 solid 3px;padding:5px;">
+        <p class="tc lh30 ">
+          历史数据 　<i class="cfa fa fa-plus cursorPoint" @click="cleartest()" style="width: auto;"></i>
+        </p>
+        <div v-if="this.loglist.length==0">没有数据</div>
+        <template v-for="(item,index) in loglist">
+          <p v-if="item.pkid==0">
+            <span class="blk hid fs14 cursorPoint">－－－－－－－－－－－－－－</span>
+          </p>
+          <p class="pb5" v-else>
+            <span class="blk fs14 cursorPoint" @click="setTestInfo(index)"><i class="cfa fa fa-times cursorPoint" @click="deldoc(item.pkid)" style="width: auto;"></i>{{item.ctitle}}</span>
+            <span class="blk fs12">
+
+            </span>
+          </p>
+        </template>
+
+      </div>
+      <div style="flex: 1;background-color: #fff;">
+        <div style="display: flex;padding: 10px;">
+          <div class="flex1 mr5">
+
+            <el-form ref="form" label-width="100px" :id="'choice_form_doctest'">
+              <input type="text" :value="testinfo.pkid" name="pkid" v-show="false"/>
+
+              <el-form-item label="ID：">
+                <div style="display: flex;">
+                  <span class="w50"> {{testinfo.pkid}}</span>
+                  <span class="w50"> 标题：</span>
+                  <el-input type="text" class="flex1" max="99999" min="100" v-model="testinfo.ctitle" name="ctitle"></el-input>
+                </div>
+
+              </el-form-item>
+              <el-form-item label="请求地址：">
+                <div style="display: flex;">
+                  <input type="hidden" v-model="testinfo.cmethod" name="cmethod"/>
+                  <el-select v-model="testinfo.cmethod" class="w100 pl10" placeholder="请选择请求方式">
+                    <el-option
+                      v-for="item in request_method"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    >
+                    </el-option>
+                  </el-select>
+                  <el-input v-model="testinfo.curl" name="curl" validate="required:" class="flex1 " style="width:600px;">
+                  </el-input>
+                </div>
+              </el-form-item>
+              <el-form-item label="头部信息：">
+                <el-input v-model="testinfo.chead" name="chead" validate="json:"></el-input>
+              </el-form-item>
+              <el-form-item label="body参数：">
+                <el-input type="textarea" v-model="testinfo.cquery" autosize name="cquery" ></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button class="tc pa5" @click="signencode" type="default">生成验签</el-button>
+              </el-form-item>
+              <el-form-item label="body验签：">
+                <el-input type="textarea" v-model="testinfo.cquery2" autosize name="cquery2"  ></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button class="tc pa5" @click="base64encode" type="default">body参数加密</el-button>
+                <el-button class="tc pa5" @click="base64decode" type="default">body结果解密</el-button>
+              </el-form-item>
+              <el-form-item label="body结果：">
+                <el-input type="textarea" v-model="testinfo.cqueryrsa" name="cqueryrsa" autosize validate="required:"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button class="tc pa5" @click="getURLContent()" type="primary">请求</el-button>
+                <el-button class="tc pa5" @click="saveRequestLog(1)" type="primary" v-if="testinfo.pkid>0">保存记录</el-button>
+                <el-button class="tc pa5" @click="saveRequestLog(0)" type="primary">新增记录</el-button>
+              </el-form-item>
+              <el-form-item label="请求结果：">
+                <el-input type="textarea" v-model="testinfo.cresponse" rows="5" name="cresponse" id="cresponse"></el-input>
+                响应时间：{{runtime}}　　状态：{{status}}
+              </el-form-item>
+              <el-form-item label="备注：">
+                <el-input type="textarea" v-model="testinfo.ccontent" autosize name="ccontent"></el-input>
+              </el-form-item>
+              <el-form-item label="请求结果：">
+                说明：头部信息为JSON格式，请求参数为JSON格式
+              </el-form-item>
+            </el-form>
+
+          </div>
+
+        </div>
+
+        <div class="flex1" style="border-top: #B3C0D1 solid 3px;">
+          <div class="pa10">
+
+            <p class="pb3">请求结果：
+              <button id="collapse-btn">合并</button>
+              <button id="expand-btn">展开</button>
+              <button id="toggle-btn">切换</button>
+              <button id="toggle-level1-btn">切换1级</button>
+              <button id="toggle-level2-btn">切换2级</button>
+              <button id="toggle-level3-btn">切换3级</button>
+            </p>
+            <div id="json" style="border: gray solid 1px;height: 800px;overflow: auto;background-color: #C0C0C0;"></div>
+            <el-input type="textarea" v-model="testinfo.cquery" v-show="false" name="cquery"></el-input>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </el-card>
+
+</div>
+
+
+{[{end}]}

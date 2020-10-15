@@ -1,0 +1,244 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+<style type="text/css">
+
+  .a2 a {
+    border: #12518F solid 1px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: white;
+    margin-left: 20px;
+    background-color: #3a8ee6;
+  }
+
+
+  .content h3 {
+    color: #bbbbbb;
+    padding: 20px 0;
+  }
+
+
+</style>
+{[{end}]}
+
+{[{define  "script"}]}
+
+<script src="/html/res/js/md5.js" ></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data() {
+      return {
+        applicationid: 0,
+        list: [],
+        showlist: true,
+        showinfo: false,
+        info: {},
+        appinfo: {},
+        encrypttype: [{label: "MD5", value: "md5"}],
+        CLIENT:CLIENT
+      }
+    },
+    mounted() {
+      this.$nextTick(function () {
+        this.initData()
+      })
+    },
+    filters: {
+      status(value) {
+        if(value==1){
+          return "启用"
+        }else if(value==2){
+          return "锁定"
+        }else if(value==0){
+          return "停用"
+        }
+        return  value
+      },
+    },
+    methods: {
+      initData() {
+          this.list = {[{.list}]}
+          this.appinfo = {[{.info}]}
+          this.applicationid=getUrlParam("appid")
+      },
+      add() {
+        this.info = {cstatus: 0, cencryptcode: "",caescode:"", capplicationid: this.applicationid}
+        this.showinfo = true
+        this.showlist = false
+      },
+      cancel() {
+        this.showinfo = false
+        this.showlist = true
+      },
+      editItem(id) {
+        this.showinfo = true
+        this.showlist = false
+        let vue =this
+        get("applicationclient/detail", {"id": id},function (res) {
+          vue.info = res.info
+        })
+      },
+      dealItem(id) {
+        this.$confirm('此操作将删除该信息, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          post("applicationclient/dealitem", {id: id, status: -1}, null, function (data) {
+            location.href=location.href
+          })
+        });
+      },
+      redirect(id) {
+        this.$router.push({name: 'openapi', query: {id: id}})
+      },
+      onSubmit() {
+        formsubmit(this, "choice_form", "applicationclient/postdata", null, function (data) {
+          location.href=location.href
+        })
+      },
+      cancel() {
+        this.showinfo = false
+        this.showlist = true
+      },
+      cmd5() {
+        let tmp = Date.parse(new Date());
+        this.info.cencryptcode = MD5(tmp + "123456")
+      },
+
+    }
+
+  })
+
+</script>
+
+{[{end}]}
+
+{[{define "content"}]}
+<div id="app" class=" dis_f flex_colu">
+
+    <p class="pb10">
+      项目：{{appinfo.ctitle}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<el-button type="primary" @click="add">新增</el-button>
+    </p>
+    <template v-if="showlist">
+      <el-table :data="list" stripe style="width: 100%">
+        <el-table-column prop="ctitle" label="名称"></el-table-column>
+        <el-table-column label="状态" width="100">
+          <template slot-scope="scope">
+            <span>{{scope.row.cstatus|status('enable')}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="cclient" label="客户端"></el-table-column>
+        <el-table-column prop="cclientagent" label="Header(lecheng-client)" width="250"></el-table-column>
+        <el-table-column prop="cenablesign" label="验签加密" width="100">
+          <template slot-scope="scope">{{scope.row.cenablesign==1?"启用":"停用"}}</template>
+        </el-table-column>
+
+        <el-table-column prop="cenableaes" label="AES加密" width="100">
+          <template slot-scope="scope">{{scope.row.cenableaes==1?"启用":"停用"}}</template>
+        </el-table-column>
+        <el-table-column prop="ccontent" label="描述"></el-table-column>
+        <el-table-column label="操作" width="200">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="editItem(scope.row.pkid)">编辑</el-button>
+            <el-button type="text" size="small" v-if="scope.row.cstatus==0" @click="dealItem(scope.row.pkid)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </template>
+    <div v-show="showinfo">
+      <el-card class="box-card mt20">
+        <el-form ref="form" label-width="120px" id="choice_form">
+          <el-form-item label="ID：" v-show="info.pkid">
+            {{info.pkid}}
+            <el-input v-model="info.pkid" v-show="false" style="width:150px;" class="w200" name="pkid" :readonly="true"></el-input>
+            <el-input v-model="info.capplicationid" v-show="false" name="capplicationid"></el-input>
+          </el-form-item>
+          <el-form-item label="名称：">
+            <el-input v-model="info.ctitle" class="w200" name="ctitle" validate="required:"></el-input>
+          </el-form-item>
+          <el-form-item label="客户端类型：">
+            <input type="hidden" v-model="info.cclient" name="cclient"/>
+            <el-select v-model="info.cclient" name="cclient" placeholder="请选择客户端类型">
+              <el-option
+                      v-for="item in CLIENT"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="头部值：">
+            <el-input v-model="info.cclientagent" class="w200 fl" name="cclientagent" validate="required:">
+              <template slot="prepend">Lecheng-Client =</template>
+            </el-input>
+            Lecheng-Client 值必须唯一，不能重复
+          </el-form-item>
+          <el-form-item label="状态：">
+            <template>
+              <el-radio v-model="info.cstatus" name="cstatus" label="0">禁用</el-radio>
+              <el-radio v-model="info.cstatus" name="cstatus" label="1">启用</el-radio>
+            </template>
+            <el-tooltip v-if="false" class="item ml30" effect="dark" content="锁定状态无法需要手动解锁才能编辑数据" placement="top-end">
+              <i class="el-icon-info"></i>
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item label="">
+            <el-switch
+                    v-model="info.cenablesign"
+                    active-value="1"
+                    inactive-value="0"
+                    inactive-text="停用验签"
+                    active-text="启用验签"
+            ></el-switch>
+            <input name="cenablesign" v-model="info.cenablesign"  type="hidden" />
+          </el-form-item>
+          <el-form-item label="">
+            <el-switch
+                    v-model="info.cenableaes"
+                    active-value="1"
+                    inactive-value="0"
+                    inactive-text="停用Base64加密"
+                    active-text="启用Base64加密"
+            ></el-switch>
+            <input name="cenableaes" v-model="info.cenableaes"  type="hidden" />
+          </el-form-item>
+
+          <el-form-item label="验签加密盐值：">
+            <el-input v-model="info.cencryptcode" class="w200" name="cencryptcode" validate="required:" :disabled="true"></el-input>
+            验签采用md5加密 <input type="hidden" value="md5" name="cencrypttype"/>
+          </el-form-item>
+
+          <!--          <el-form-item label="AES密钥：">-->
+          <!--            <el-input v-model="info.caescode" class="w200" name="caescode" validate="required:" :disabled="true"></el-input>-->
+          <!--            AES密钥/偏移量-->
+          <!--          </el-form-item>-->
+          <el-form-item label="">
+            <el-button @click="cmd5">生成盐值</el-button>
+            <!--            <el-button @click="aes">生成AES密钥/偏移量</el-button>-->
+          </el-form-item>
+          <el-form-item label="描述：">
+            <el-input type="textarea" v-model="info.ccontent" class="w200" name="ccontent" ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" id="btnsubmit" @click="onSubmit"> 提 交</el-button>
+            <el-button @click="cancel"> 返 回</el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
+    </div>
+
+
+</div>
+{[{end}]}
+
+
+<style scoped>
+
+</style>

@@ -1,0 +1,39 @@
+{
+  "cros": {
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "Content-Type,lecheng-client,lecheng-version,X-Requested-With,*",
+    "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Expose-Headers": "lecheng-client,lecheng-version"
+  },
+  "cros_": "跨域配置",
+  "env": "dev",
+  "hostport": ":8180",
+  "log": {
+    "_level": "level值说明：debug,info,warn,error,dpanic,panic,fatal",
+    "level": "error",
+    "logtype": "file"
+  },
+  "name": "乐橙网关系统--网关系统",
+  "setting": {
+    "debuginfo": false,
+    "debuginfo_": "返回数据加入debugInfo信息",
+    "enablehtmlsystem": true,
+    "enablehtmlsystem_": "是否启用HMLT界面管理系统",
+    "encryptparamnname": "lccontent",
+    "encryptparamnname_": "加密值对应参数名称",
+    "gatewayapipath": "gatewayapi",
+    "jsonparamnname": "data",
+    "passthroughpara": [
+      "token",
+      "userToken"
+    ],
+    "passthroughpara_": "透传参数，需要参与验签",
+    "signname": "lcsign"
+  },
+  "token": {
+    "dessalt": "Ssdf521D",
+    "md5salt": "STARTlechengaaa15641END"
+  },
+  "token_": "cookie加密使用"
+}

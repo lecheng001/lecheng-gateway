@@ -1,0 +1,106 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+<style type="text/css">
+
+    .a2 a {
+        border: #12518F solid 1px;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 14px;
+        color: white;
+        margin-left: 20px;
+        background-color: #3a8ee6;
+    }
+
+
+    .content h3 {
+        color: #bbbbbb;
+        padding: 20px 0;
+    }
+
+
+</style>
+{[{end}]}
+
+{[{define  "script"}]}
+
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                list: [],
+                debuginfo:false
+            }
+        },
+        mounted() {
+            this.$nextTick(function () {
+                this.initData()
+            })
+        },
+        methods: {
+            initData() {
+                this.list = {[{.list}]}
+                this.debuginfo={[{.debuginfo}]}
+
+
+            },
+            refreshgateway() {
+                post( "/gatewaymanage/refresh", "choice147852")
+            },
+            refreshcertificate(){
+                post( "/gatewaymanage/certificate", "choice147852",null,function (a) {
+                   location.href=location.href
+                })
+            },
+            refreshconfig(){
+                post( "/gatewaymanage/refreshconfig", "choice147852",null,function (a) {
+                    location.href=location.href
+                })
+            },
+            changeDebug(){
+                post( "/gatewaymanage/changedebug", "choice147852",null,function (a) {
+                    location.href=location.href
+                })
+            }
+        }
+
+    })
+
+</script>
+
+{[{end}]}
+
+{[{define "content"}]}
+<div id="app" class=" dis_f flex_colu">
+     <div v-for="item in list" class="pb20">
+      <span class=" inblk pl20">PROXY服务IP端口：{{item}}</span>
+      <span class="inblk pl20">基础数据刷新地址：{{item}}/system/refresh</span>
+    </div>
+
+    <el-card class="box-card mt20">
+      <div slot="header" class="clearfix">
+        <span>  刷新网关配置 </span>
+      </div>
+      <p class="pl20">
+        <el-button type="primary" @click="refreshgateway">刷新网关数据</el-button>
+        <el-button type="primary" @click="refreshcertificate">刷新网关证书</el-button>
+        <el-button type="primary" @click="refreshconfig">刷新网关CONFIG</el-button>
+      </p>
+    </el-card>
+    <el-card class="box-card mt20">
+        <div slot="header" class="clearfix">
+            <span>  调试模式 </span>
+        </div>
+        <p>状态：{{debuginfo?"调试模式":"正常不显示调试信息"}}</p>
+        <p class="pl20 pt20">
+            <el-button type="primary" @click="changeDebug">{{debuginfo?"关闭DebugInfo":"开启DebugInfo"}}</el-button>
+        </p>
+    </el-card>
+</div>
+
+
+{[{end}]}

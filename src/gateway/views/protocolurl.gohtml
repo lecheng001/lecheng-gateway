@@ -1,0 +1,333 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+<style type="text/css">
+
+    .a2 a {
+        border: #12518F solid 1px;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 14px;
+        color: white;
+        margin-left: 20px;
+        background-color: #3a8ee6;
+    }
+
+
+    .content h3 {
+        color: #bbbbbb;
+        padding: 20px 0;
+    }
+
+
+</style>
+{[{end}]}
+
+{[{define  "script"}]}
+
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                list: [],
+                listsource: [],
+                applications: [],
+                info:{},
+                questmethod: [{label: "GET", value: "GET"}, {label: "POST", value: "POST"}],
+                total: 0,
+                pageindex: 1,
+                searchkey: "",
+                searchapplicationid: "",
+                isadd: false,
+                showlist: true,
+                showinfo: false,
+                config:CONFIG,
+                modulepath: "",
+                moduleserverhost: "",
+                modules: [],
+                gatewayhost:""
+            }
+        },
+        mounted() {
+            this.$nextTick(function () {
+                this.initData(this)
+            })
+        },
+        methods: {
+            initData(data) {
+                this.showinfo = false
+                this.showlist = true
+                this.listsource = {[{.list}]}
+                this.applications = {[{.applications}]}
+                this.modules = {[{.modules}]}
+                this.setListData()
+            },
+            setListData() {
+                while (this.list.length > 0) {
+                    this.list.pop()
+                }
+
+                for (let i = 0; i < this.listsource.length; i++) {
+                    if (this.searchapplicationid > 0) {
+                        if (this.listsource[i].capplicationid == this.searchapplicationid) {
+                            this.list.push(this.listsource[i])
+                        }
+                    } else {
+                        this.list.push(this.listsource[i])
+                    }
+                }
+
+                console.log(this.list)
+            },
+            editItem(id) {
+                this.showinfo = true
+                this.showlist = false
+                this.isadd = false
+                let vue=this
+                if(id>0) {
+                    get("protocolurl/detail", {"id": id}, function (res) {
+                        vue.info = res.info
+                        if(res.info.capplicationids==""){
+                            vue.info["applicationids"] =[]
+                        } else{
+                            vue.info["applicationids"] = res.info.capplicationids.split(",")
+                        }
+                        vue.setURL()
+                    })
+                }
+            },
+            dealItem(id) {
+                this.$confirm('此操作将删除该信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    post( "/protocolurl/dealitem", {id: id, status: -1}, null, function (data) {
+                        location.href=location.href
+                    })
+                });
+            },
+            redirect(url) {
+                location.href=url
+            },
+            changePage() {
+                this.initData(this)
+            },
+            search() {
+                this.$route.query.searchkey = this.searchkey
+                this.$route.query.appid = this.searchapplicationid
+                this.initData(this)
+            },
+            checkURL() {
+                let vue=this
+                if (this.info.csourceurl) {
+
+                   get( "/protocolurl/checkurl", {url: this.info.csourceurl, id: this.info.pkid},function (res) {
+                       if (res.row != null) {
+                           alert(vue.info.csourceurl + "已经存在，标题：" + res.row.ctitle)
+                       }
+                   })
+                }
+            },
+            setURL() {
+                let modulepath="";
+                let applicationpath="";
+                for (let j = 0; j < this.modules.length; j++) {
+                    if (this.modules[j].pkid == this.info.cmoduleid) {
+                        this.modulepath = this.modules[j].curl
+                        modulepath = this.modules[j].curl
+                        this.moduleserverhost=this.modules[j].chost
+                        // let tmp=this.info.ctargeturl.split("/")
+                        // if(tmp.length>0){
+                        //     tmp[1]=modulepath
+                        // }
+                        // this.info.ctargeturl=tmp.join("/")
+                        break
+                    }
+                }
+
+                //全部项目
+                if(this.info.ccontainallapp==1){
+                    console.log("全部项目");
+                    this.info.csourceurl="/([^/]*)/"+modulepath+"/(.*)"
+                    return
+                }
+                if(this.info.applicationids.length>0) {
+                    console.log(this.info.applicationids);
+                    this.info.capplicationids = this.info.applicationids.join(",")
+                    for (let j = 0; j < this.applications.length; j++) {
+                        if (this.info.applicationids.indexOf(this.applications[j].pkid + "") > -1) {
+                            applicationpath += "|" + this.applications[j].cpath
+                        }
+                    }
+
+                    applicationpath = applicationpath.substring(1)
+
+                    console.log("选择项目ID：" + this.info.applicationids + applicationpath);
+                    this.info.csourceurl = "/(" + applicationpath + ")/" + modulepath + "/(.*)"
+                }
+            },
+            onSubmit() {
+                if (this.info.ctargeturl.indexOf("$") > 0) {
+                    if(this.info.ccontainallapp=="1"){
+                        let tmpIndex=this.info.ctargeturl.indexOf("$")
+                        let lvIndex=this.info.ctargeturl.substring(tmpIndex+1,tmpIndex+2)
+                        if(parseInt(lvIndex)<2){
+                            alert(this.info.ctargeturl + "在全部项目匹配时，$x参数位置不得小于$2")
+                            return;
+                        }
+                    }
+                    formsubmit(this, "basicinfo", "/protocolurl/postdata", null, function (data) {
+                        location.href=location.href
+                    })
+
+                } else {
+                    alert(this.info.ctargeturl + "没有包含$x参数信息，无法执行转发")
+                    return;
+                }
+            },
+        },
+        filters: {
+            status(value) {
+                if (value == 1) {
+                    return "启用"
+                } else if (value == 2) {
+                    return "锁定"
+                } else if (value == 0) {
+                    return "停用"
+                }
+                return value
+            },
+        },
+
+
+    })
+
+</script>
+
+{[{end}]}
+
+{[{define "content"}]}
+<div id="app" class=" dis_f flex_colu">
+    <div class="pb10 flex_row">
+        <el-button type="primary" @click="editItem(0 )">新增</el-button>
+    </div>
+    <template v-if="showlist">
+    <el-table :data="list" stripe style="width: 100%;overflow: auto;">
+        <el-table-column prop="pkid" label="ID" width="50"></el-table-column>
+        <el-table-column prop="ctitle" label="名称"></el-table-column>
+        <el-table-column label="状态" width="100">
+            <template slot-scope="scope">
+                <span>{{scope.row.cstatus|status('enable')}}</span>
+            </template>
+        </el-table-column>
+        <el-table-column prop="applications" label="客户端a"></el-table-column>
+        <!--        <el-table-column prop="cmonitorstatus" label="监测" width="60"></el-table-column>-->
+        <el-table-column prop="csourceurl" label="请求地址"  width="250"></el-table-column>
+        <el-table-column prop="ctargeturl" label="转发地址"></el-table-column>
+        <el-table-column prop="csort" label="匹配顺序"></el-table-column>
+        <el-table-column label="操作" width="150">
+            <template slot-scope="scope">
+
+                <el-button type="text" size="small" @click="editItem(scope.row.pkid)">编辑</el-button>
+                <el-button type="text" size="small" v-if="scope.row.cstatus==0" @click="dealItem(scope.row.pkid)">删除</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    </template>
+    <div v-show="showinfo" class="pt20 ">
+        <el-card class="box-card mt10 mb20">
+            <el-form ref="form" label-width="100px" style="width:80%;" id="basicinfo">
+                <el-form-item label="ID：" v-show="info.pkid">
+                    {{info.pkid}}
+                    <el-input v-model="info.pkid" v-show="false" name="pkid"></el-input>
+                    <!--          <el-input v-model="info.cstatus" v-show="false" name="cstatus"></el-input>-->
+                    <el-input v-model="info.cmoduleid" v-show="false" name="cmoduleid"></el-input>
+                </el-form-item>
+                <el-form-item label="名称：">
+
+                    <el-input v-model="info.ctitle" class="w200" name="ctitle" validate="required:"></el-input>
+                </el-form-item>
+                <el-form-item label="状态：  ">
+                    <template>
+                        <el-radio v-model="info.cstatus" name="cstatus" label="0">禁止</el-radio>
+                        <el-radio v-model="info.cstatus" name="cstatus" label="1">启用</el-radio>
+                    </template>
+                </el-form-item>
+                <el-form-item label="适配方式：">
+                    <el-switch
+                            v-model="info.ccontainallapp"
+                            active-value="1"
+                            inactive-value="0"
+                            inactive-text="指定项目"
+                            active-text="全部项目"
+                            @change="setURL"
+                    ></el-switch>
+                    <input name="ccontainallapp" v-model="info.ccontainallapp"  type="hidden" />
+                </el-form-item>
+                <template v-if="info.ccontainallapp==0">
+                    <el-form-item label="应用项目：">
+                        <input type="hidden" v-model="info.capplicationids" name="capplicationids"/>
+                        <el-select v-model="info.applicationids" multiple class="w500" placeholder="请选择应用项目" @change="setURL">
+                            <el-option
+                                    v-for="item in applications"
+                                    :key="item.pkid"
+                                    :label="item.ctitle"
+                                    :value="item.pkid">
+                            </el-option>
+                        </el-select> &nbsp;&nbsp;&nbsp;多选，可以一次性配置多个应用项目
+                    </el-form-item>
+                </template>
+
+                <el-form-item label="请求地址：">
+                    <el-input v-model="info.csourceurl" name="csourceurl" validate="required:" @change="checkURL">
+                        <template slot="prepend">{{config.gatewayurl}}</template>
+                    </el-input>
+                    <p>地址不能重复，必须是唯一的;正则地址必须包含()，正则（）取得的数据对应变量$1,$2到$9；启用全项目适配必须在适配方式选择全项目适配；匹配类型：
+                        <br /> 1：单项目适配：,/aaa/mall/(.*)，URL参数为$1
+                        <br /> 2：多项目适配：,/(aaa|bbb)/mall/(.*)，URL参数为$2
+                        <br /> 3：全项目适配：,/([^/]*)/mall/(.*)，URL参数为$2，第一个正则变量必须是应用项目入口地址；</p>
+                </el-form-item>
+                <el-form-item label="微服务：">
+                    <el-select v-model="info.cmoduleid" placeholder="请选择微服务" @change="setURL">
+                        <el-option
+                                v-for="item in modules"
+                                :key="item.pkid"
+                                :label="item.ctitle"
+                                :value="item.pkid">
+                        </el-option>
+                    </el-select>
+                    &nbsp;&nbsp;&nbsp;微服务前缀地址：{{modulepath}}
+                </el-form-item>
+                <el-form-item label="转发地址：">
+                    <el-input v-model="info.ctargeturl" style="width: 500px" name="ctargeturl" validate="required:">
+                        <template slot="prepend">http://{{moduleserverhost}}</template>
+                    </el-input>
+                    <p>如：/mall/$1 ,/mall/$2</p>
+                </el-form-item>
+                <el-form-item label="匹配顺序：">
+                    <el-input-number v-model="info.csort" name="csort" :min="1" :max="1000" label="描述文字"></el-input-number>
+                    <p>数值越小越先匹配正则表达式， 当正则表达式有重叠时可通过匹配顺序控制</p>
+                </el-form-item>
+                <el-form-item label="超时：">
+                    <el-input v-model="info.ctimeout" type="number" name="ctimeout" style="width: 100px;"></el-input>
+                    毫秒，0值表示继承系统默认值
+                </el-form-item>
+                <el-form-item label="描述：">
+                    <el-input type="textarea" v-model="info.ccontent" class="w200" name="ccontent"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" id="btnsubmit" @click="onSubmit"> 提 交</el-button>
+                    <el-button @click="redirect('/html/protocolurl/list')"> 返 回</el-button>
+                </el-form-item>
+            </el-form>
+
+        </el-card>
+    </div>
+</div>
+
+
+{[{end}]}

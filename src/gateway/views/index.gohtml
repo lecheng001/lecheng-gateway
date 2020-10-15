@@ -1,0 +1,80 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+    <style type="text/css">
+
+        .a2 a {
+            border: #12518F solid 1px;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: white;
+            margin-left: 20px;
+            background-color: #3a8ee6;
+        }
+
+
+        .content h3 {
+            color: #bbbbbb;
+            padding: 20px 0;
+        }
+
+    </style>
+{[{end}]}
+
+{[{define  "script"}]}
+    <link rel="stylesheet" href="/html/res/jsplus/jsonview/jquery.jsonview.css" />
+   <script type="text/javascript" src="/html/res/jsplus/jsonview/jquery.jsonview.js"></script>
+    <script type="text/javascript">
+        var lvData={[{.info}]}
+        $(document).ready(function () {
+            $('#collapse-btn').on('click', function () {
+                $('#json').JSONView('collapse');
+            });
+
+            $('#expand-btn').on('click', function () {
+                $('#json').JSONView('expand');
+            });
+
+            $('#toggle-btn').on('click', function () {
+                $('#json').JSONView('toggle');
+            });
+
+            $('#toggle-level1-btn').on('click', function () {
+                $('#json').JSONView('toggle', 1);
+            });
+
+            $('#toggle-level2-btn').on('click', function () {
+                $('#json').JSONView('toggle', 2);
+            });
+            $('#toggle-level3-btn').on('click', function () {
+                $('#json').JSONView('toggle', 3);
+            });
+
+            $("#json").JSONView(lvData, {collapsed: true, nl2br: true, recursive_collapser: true});
+            // initData()
+        })
+
+    </script>
+{[{end}]}
+
+{[{define "content"}]}
+    <div style="line-height: 25px;" class="pa10 flex_colu">
+            <p class="">网关运行数据：  </p>
+            <p>
+                <button id="collapse-btn">合并</button>
+                <button id="expand-btn">展开</button>
+                <button id="toggle-btn">切换</button>
+                <button id="toggle-level1-btn">切换1级</button>
+                <button id="toggle-level2-btn">切换2级</button>
+                <button id="toggle-level3-btn">切换3级</button>
+            </p>
+
+            <div id="json" class="flex1" style="border: gray solid 1px; overflow: auto;background-color: #C0C0C0; margin-top: 10px;"></div>
+
+
+    </div>
+
+{[{end}]}

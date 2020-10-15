@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{[{block "title" . }]}{[{end}]}乐橙网关管理系统 </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0">
+    <meta name="product-type" content="1">
+    <meta name="version" content="6.7.0">
+    <!-- Browser-360 speed mode is enabled (webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- Use IE and Chrome latest version -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="shortcut icon" href="res/favicon.ico">
+    <script src="https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/html/res/js/common.js"></script>
+    <link href="/html/res/css/basiccommon.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/html/res/css/common.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <!-- 生产环境版本，优化了尺寸和速度 -->
+    <script _src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    {[{block "css" .}]}{[{end}]}
+
+</head>
+<body style="display: flex;justify-content: center;">
+<div style="width: 100%" class="dis_f flex_row">
+    <div id="menu" class="menu dis_f flex_colu" >
+        <p><img src="/html/res/image/logo2.png" class="h50 pt5 pl10"/></p>
+        <p class="menutitle pt20"><i class="fa fa-plus pl5"></i> 首页</p>
+        <ul>
+            <li>
+                <a index="1" style="text-align: left" onclick="location.href='/html/home'" class="colFFF">
+                    <i class="cfa fa fa-home colFFF"></i>
+                    <span class="inblk lh17 colFFF">首页</span>
+                </a>
+            </li>
+        </ul>
+        <p class="menutitle"><i class="fa fa-plus pl5"></i> 基础数据</p>
+        <ul>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/application/list'" class="colFFF">
+                    <i class="cfa fa fa-object-ungroup colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">应用项目</span>
+                </a>
+            </li>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/module/list'" class="colFFF">
+                    <i class="cfa fa fa-microchip colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">微服务</span>
+                </a>
+            </li>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/moduleserver/list'" class="colFFF">
+                    <i class="cfa fa fa-server colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">微服务服务器</span>
+                </a>
+            </li>
+        </ul>
+        <p class="menutitle"><i class="fa fa-plus pl5"></i> 接口数据</p>
+        <ul>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/protocolurl/list'" class="colFFF">
+                    <i class="cfa fa fa-fighter-jet colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">协议适配</span>
+                </a>
+            </li>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/protocolurlget/list'" class="colFFF">
+                    <i class="cfa fa fa-glide-g colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">GET转跳协议</span>
+                </a>
+            </li>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/upload/list'" class="colFFF">
+                    <i class="cfa fa fa-upload colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">上传配置</span>
+                </a>
+            </li>
+        </ul>
+        <p class="menutitle"><i class="fa fa-plus pl5"></i>网关管理</p>
+        <ul>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/systemsetting'" class="colFFF">
+                    <i class="cfa fa fa-gavel colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">网关配置</span>
+                </a>
+            </li>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/gatewaymanage'" class="colFFF">
+                    <i class="cfa fa fa-refresh colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">刷新网关</span>
+                </a>
+            </li>
+        </ul>
+        <p class="menutitle"><i class="fa fa-plus pl5"></i>日志测试</p>
+        <ul>
+            <li>
+                <a index="1" align="left" onclick="location.href='/html/testurl'" class="colFFF">
+                    <i class="cfa fa fa-book colFFF"></i>
+                    <span slot="title" class="inblk lh17 colFFF">接口测试</span>
+                </a>
+            </li>
+        </ul>
+        <p class="menutitle"><i class="fa fa-plus pl5"></i> 退出</p>
+        <ul>
+            <li>
+                <a index="1" style="text-align: left" onclick="logout()" class="colFFF">
+                    <i class="cfa fa fa-home colFFF"></i>
+                    <span class="inblk lh17 colFFF">注销</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="flex1  dis_f flex_colu">
+        <div style="background-color: #B3C0D1;height: 60px;" class="">
+            <div class="tl" style="display: flex;line-height: 60px;">
+                <span class="w30">
+                    <i class="cfa fa fa-navicon cursorPoint" onclick="showLeftMenu()"></i>
+                </span>
+                <p id="menu_title" class="flex1">
+                    <span style="display: inline-block;padding-right: 30px">项目：{[{.gateway_package_choice.projecttitle}]}</span>
+                    <span >版本号：{[{.gateway_package_choice.version}]}</span>
+
+                </p>
+            </div>
+        </div>
+        <div style="justify-content: left;padding: 20px;overflow: auto;" class=" dis_f flex_colu">
+            {[{block "content" .}]}{[{end}]}
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var CONFIG = {
+        "apiurl": "http://localhost:8181/backapi",
+        "gatewayurl": "http://ceshi.lechengclub.com/gateway",
+    }
+    var REQUEST_METHOD = [{label: 'GET', value: 'get'},{label: 'POST', value: 'post'},{label: 'PUT', value: 'put'},{label: 'DELETE', value: 'delete'}]
+    var REQUEST_DATATRANSLATE = [{label: 'URL', value: 'url'},{label: 'BODY_FORM', value: 'body_form'},{label: 'BODY_JSON', value: 'body_json'},{label: 'BODY_MultiPart', value: 'body_multipart'}]
+    var ENV = [{label: '生产环境', value: 'pro'},{label: '测试环境', value: 'test'},{label: '开发环境', value: 'dev'},]
+    var CLIENT = [{label: 'Android', value: 'android'},{label: 'IOS', value: 'ios'},{label: 'WEB', value: 'web'},{label: 'MiniPro', value: '小程序'},{label: '测试', value: 'test'}]
+
+
+    $(document).ready(function () {
+        let package={[{.gateway_package_choice}]}
+        console.log(package)
+
+        let packagehtml='<span style="display: inline-block;padding-right: 30px">网关版本：V' + package.version + '</span>'
+        if (package.projectid>0) {
+            packagehtml += '<span style="display: inline-block;padding-right: 30px">证书信息：[项目名称：' + package.projecttitle + ']</span>'
+        }else {
+            packagehtml += '<span style="display: inline-block;padding-right: 30px">证书信息：[无证书]</span>'
+            packagehtml += '<span style="display: inline-block;padding-right: 10px">证书下载地址：<a href="http://localhost:8061/user_projectshequ.html" target="_blank" style="color:darkred">点击进入</a></span>'
+            packagehtml += '<span style="display: inline-block;">未配置证书导致部分网关请求无效</span>'
+        }
+        $("#menu_title").html(packagehtml)
+        if (location.href.indexOf("/html/login") >= 0) {
+            return
+        } else {
+            let token = getCookie("token");
+            if (!token) {
+                location.href = "/html/login"
+            }
+        }
+        // checkLogin();
+    });
+
+    function showLeftMenu() {
+        let width=$("#menu").width();
+        if (width>100){
+            $("#menu").width(0);
+        }else {
+            $("#menu").width(180);
+        }
+    }
+
+    function logout() {
+        delCookie("token")
+        setTimeout(function () {
+            location.href="/html"
+        },100)
+
+    }
+</script>
+{[{block "script" .}]}{[{end}]}
+</body>
+</html>

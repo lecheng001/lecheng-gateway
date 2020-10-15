@@ -1,0 +1,167 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+<style type="text/css">
+
+    .a2 a {
+        border: #12518F solid 1px;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 14px;
+        color: white;
+        margin-left: 20px;
+        background-color: #3a8ee6;
+    }
+
+
+    .content h3 {
+        color: #bbbbbb;
+        padding: 20px 0;
+    }
+
+
+</style>
+{[{end}]}
+
+{[{define  "script"}]}
+
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                list: [],
+                showlist: true,
+                showinfo: false,
+                info: {}
+            }
+        },
+        mounted() {
+            this.$nextTick(function () {
+                this.initData()
+            })
+        },
+        filters: {
+            status(value) {
+                if (value == 1) {
+                    return "启用"
+                } else if (value == 2) {
+                    return "锁定"
+                } else if (value == 0) {
+                    return "停用"
+                }
+                return value
+            },
+        },
+        methods: {
+            initData() {
+                this.list = {[{.list}]}
+            },
+            add() {
+                this.info = {cstatus: 0}
+                this.showinfo = true
+                this.showlist = false
+            },
+            cancel() {
+                this.showinfo = false
+                this.showlist = true
+            },
+            editItem(id) {
+                this.showinfo = true
+                this.showlist = false
+                let vue = this
+                get("/module/detail", {"id": id}, function (res) {
+                    vue.info = res.info
+                })
+            },
+            dealItem(id) {
+                this.$confirm('此操作将删除该信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    post( "/module/dealitem", {id: id, status: -1}, null, function (data) {
+                        location.href=location.href
+                    })
+                });
+            },
+            redirect(url) {
+               location.href=url
+            },
+            onSubmit() {
+               formsubmit(this, "choice_form", "module/postdata", null, function (data) {
+                   location.href=location.href
+                })
+            }
+        }
+
+    })
+
+</script>
+
+{[{end}]}
+
+{[{define "content"}]}
+<div id="app" class=" dis_f flex_colu">
+    <p class="pb10">
+        <el-button type="primary" @click="add">新增</el-button>
+    </p>
+    <template v-if="showlist">
+        <el-table :data="list" stripe style="width: 100%">
+            <el-table-column prop="pkid" label="ID"></el-table-column>
+            <el-table-column prop="ctitle" label="名称"></el-table-column>
+            <el-table-column prop="curl" label="微服务入口"></el-table-column>
+            <el-table-column label="状态">
+                <template slot-scope="scope">
+                    <span>{{scope.row.cstatus|status('enable')}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column width="400" label="操作">
+                <template slot-scope="scope">
+                    <!--            <el-button type="text" size="small" @click="redirect('moduleapi',scope.row.pkid)">ModuleAPI列表</el-button>-->
+                    <el-button type="text" size="small" @click="redirect('/html/moduleserver/list?moduleid='+scope.row.pkid)">ModuleServer列表</el-button>
+                    <!--            <el-button type="text" size="small" @click="redirect('circuitbreaker',scope.row.pkid)">熔断配置</el-button>-->
+                    <el-button type="text" size="small" @click="editItem(scope.row.pkid)">编辑</el-button>
+                    <el-button type="text" v-if="scope.row.cstatus==0" @click="dealItem(scope.row.pkid)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+    <div v-show="showinfo">
+        <el-card class="box-card mt10 mb20">
+        <el-form ref="form" label-width="100px" id="choice_form">
+            <el-form-item label="ID：" v-if="info.pkid">
+                {{info.pkid}}
+                <el-input v-model="info.pkid" v-show="false" style="width:150px;" class="w200" name="pkid" :readonly="true"></el-input>
+            </el-form-item>
+
+            <el-form-item label="名称：">
+                <el-input v-model="info.ctitle" class="w200" name="ctitle" validate="required:"></el-input>
+            </el-form-item>
+            <el-form-item label="状态：">
+                <template>
+                    <el-radio v-model="info.cstatus" name="cstatus" label="0">禁用</el-radio>
+                    <el-radio v-model="info.cstatus" name="cstatus" label="1">启用</el-radio>
+                </template>
+            </el-form-item>
+            <el-form-item label="入口地址：">
+                <el-input v-model="info.curl" class="w200" name="curl" validate="required:,urlpath:"></el-input>
+                <p>如乐橙汇：lch,只支持数字、字母、/，其他字符不支持（建议使用小写字母），如：mall,mall/abc</p>
+            </el-form-item>
+            <el-form-item label="描述：">
+                <el-input type="textarea" v-model="info.ccontent" class="w200" name="ccontent"></el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" id="btnsubmit" @click="onSubmit"> 提 交</el-button>
+                <el-button @click="cancel"> 返 回</el-button>
+            </el-form-item>
+        </el-form>
+        </el-card>
+    </div>
+</div>
+
+
+{[{end}]}

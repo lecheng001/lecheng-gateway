@@ -1,0 +1,92 @@
+{[{template "base.gohtml" .}]}
+
+{[{define "title"}]}{[{end}]}
+
+{[{define  "css"}]}
+
+{[{end}]}
+
+{[{define  "script"}]}
+
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+      data() {
+        return {
+          list: [],
+          items:[]
+        }
+      },
+      mounted() {
+        this.$nextTick(function () {
+          this.initData();
+        })
+      },
+      methods: {
+        initData() {
+          let data={[{.data}]}
+          for (let item in data){
+            data[item]["key"]=item
+            this.list.push(data[item]);
+          }
+          console.log(this.list)
+        },
+        // onSubmitST(id) {
+        //   this.util.formsubmit(this, id, "/systemsetting/postdata", null, function (data) {
+        //     data.vue.initData()
+        //   })
+        // } ,
+        saveconfig(key, value) {
+            post("/systemsetting/write", {key: key, value: value})
+        },
+
+      },
+
+
+    })
+
+</script>
+
+{[{end}]}
+
+{[{define "content"}]}
+<div id="app" class=" dis_f " style="    flex-direction: row;
+    flex-wrap: wrap;">
+
+  <template v-for="(item,index) in list">
+
+    <el-card class="box-card mt10" style="padding: 5px;width:46%;height: 200px;float: left;margin-right: 10px;">
+      <div slot="header" class="clearfix">
+        <span>  选项：{{item.title}}</span>
+        <span class="blk fr ma5 w20">&nbsp;&nbsp;</span>
+        <!--          <el-button class="fr pa5" @click="onSubmitST('choice_form_ys'+item.pkid)" type="primary">保存数据</el-button>-->
+        <el-button class="fr pa5" @click="saveconfig(item.key,item.value)" type="primary">保存数据</el-button>
+      </div>
+      <el-form ref="form" label-width="100px" :id="'choice_form_ys'+index">
+        <el-form-item :label="'配置值：'">
+          <template v-if="item.valuetype=='number'">
+            <el-input :type="item.valuetype" v-model="item.value" name="value" validate="required:" style="width: 150px;"></el-input>
+            <br/>{{item.content}}
+          </template>
+          <template v-else-if="item.valuetype=='bool'">
+            <el-radio-group v-model="item.value">
+              <el-radio :label="'0'">禁用</el-radio>
+              <el-radio :label="'1'">启用</el-radio>
+            </el-radio-group>
+            <!--              <el-input :type="item.valuetype" v-model="item.value" name="value" validate="required:" style="width: 150px;"></el-input>-->
+            <br/>{{item.content}}
+          </template>
+          <template v-else>
+            <el-input :type="item.valuetype" v-model="item.value" name="value" validate="required:"></el-input>
+            {{item.content}}
+          </template>
+
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </template>
+
+</div>
+
+
+{[{end}]}

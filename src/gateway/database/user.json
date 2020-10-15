@@ -1,0 +1,11 @@
+[
+  {
+    "pkid": 1,
+    "cissuper": 1,
+    "cusername": "admin",
+    "cuserpwd":"admin" ,
+    "crealname": "admin",
+    "cstatus":1,
+    "cright": ""
+  }
+]

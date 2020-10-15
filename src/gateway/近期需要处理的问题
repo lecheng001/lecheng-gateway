@@ -1,0 +1,12 @@
+
+1：整理网关社区版代码
+2：发布到GIThub上
+3：部署
+
+
+
+1：proxy加入base64加密
+2:验签机制
+3：开发使用DEMO，前端：web、android、ios  后台：php、go  提供uniapp项目演示
+4：测试
+

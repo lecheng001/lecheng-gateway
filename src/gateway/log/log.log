@@ -1,0 +1,4 @@
+{"level":"error","ts":"2019-12-09T16:15:14.764+0800","caller":"lc_proxy/main.go:21","msg":"启动proxy"}
+{"level":"error","ts":"2019-12-09T16:15:23.605+0800","caller":"proxy/minitorqueue.go:142","msg":"could not greet:rpc error: code = DeadlineExceeded desc = context deadline exceeded"}
+{"level":"error","ts":"2019-12-09T16:20:47.031+0800","caller":"lc_proxy/main.go:21","msg":"启动proxy"}
+{"level":"error","ts":"2020-09-03T16:53:25.777+0800","caller":"gateway/main.go:24","msg":"启动proxy"}
