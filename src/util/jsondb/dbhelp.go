@@ -146,7 +146,7 @@ func Delete(jsonfile, IdKey string, id int64) (int64, error) {
 		return 0, err
 	}
 
-	err = ioutil.WriteFile(filePath, result, 777)
+	err = ioutil.WriteFile(filePath, result, 0777)
 	if err != nil {
 		return 0, err
 	}
@@ -184,7 +184,7 @@ func InsertMap(jsonfile string, colu map[string]interface{}) (int64, error) {
 		return 0, err
 	}
 
-	err = ioutil.WriteFile(filePath, result, 777)
+	err = ioutil.WriteFile(filePath, result, 0777)
 	if err != nil {
 		return 0, err
 	}
@@ -222,7 +222,7 @@ func UpdateByID(jsonfile string, id int64, colu map[string]interface{}) (int64, 
 		return 0, err
 	}
 
-	err = ioutil.WriteFile(filePath, result, 777)
+	err = ioutil.WriteFile(filePath, result, 0777)
 	if err != nil {
 		return 0, err
 	}
